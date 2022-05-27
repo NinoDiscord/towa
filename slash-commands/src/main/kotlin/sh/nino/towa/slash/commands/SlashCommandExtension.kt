@@ -24,19 +24,15 @@
 package sh.nino.towa.slash.commands
 
 import dev.floofy.utils.slf4j.logging
-import dev.kord.common.entity.DiscordApplicationCommand
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
-import dev.kord.rest.route.Route
 import io.ktor.http.*
-import kotlinx.serialization.builtins.ListSerializer
 import sh.nino.towa.core.Towa
 import sh.nino.towa.core.extension
 import sh.nino.towa.core.extensions.AbstractExtension
 import sh.nino.towa.slash.commands.application.AbstractApplicationCommand
 import sh.nino.towa.slash.commands.application.ApplicationCommandHandler
 import sh.nino.towa.slash.commands.locator.ILocator
-import sh.nino.towa.slash.commands.message.MessageCommand
 
 /**
  * Represents the [extension][AbstractExtension] that is used to control the

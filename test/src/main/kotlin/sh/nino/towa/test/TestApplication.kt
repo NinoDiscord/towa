@@ -27,8 +27,8 @@ package sh.nino.towa.test
 import dev.kord.common.entity.PresenceStatus
 import kotlinx.coroutines.runBlocking
 import sh.nino.towa.core.Towa
-import sh.nino.towa.slash.commands.useSlashCommands
 import sh.nino.towa.slash.commands.locator.ListBasedLoader
+import sh.nino.towa.slash.commands.useSlashCommands
 
 object TestApplication {
     @JvmStatic

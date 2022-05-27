@@ -29,7 +29,6 @@ import dev.kord.core.Kord
 import dev.kord.core.event.interaction.ApplicationCommandInteractionCreateEvent
 import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.core.on
-import dev.kord.rest.route.Route
 import kotlinx.coroutines.Job
 import sh.nino.towa.slash.commands.SlashCommandExtension
 
