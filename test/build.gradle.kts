@@ -31,3 +31,9 @@ plugins {
 application {
     mainClass by "sh.nino.towa.test.TestApplication"
 }
+
+dependencies {
+    implementation("org.slf4j:slf4j-simple:1.7.36")
+    implementation(project(":slash-commands"))
+    implementation(project(":core"))
+}

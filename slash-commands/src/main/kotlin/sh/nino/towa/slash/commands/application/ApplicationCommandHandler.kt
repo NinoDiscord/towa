@@ -23,9 +23,54 @@
 
 package sh.nino.towa.slash.commands.application
 
+import dev.floofy.utils.slf4j.logging
+import dev.kord.common.entity.InteractionType
+import dev.kord.core.Kord
+import dev.kord.core.event.interaction.ApplicationCommandInteractionCreateEvent
+import dev.kord.core.event.interaction.InteractionCreateEvent
+import dev.kord.core.on
+import dev.kord.rest.route.Route
+import kotlinx.coroutines.Job
 import sh.nino.towa.slash.commands.SlashCommandExtension
 
 /**
  * Represents the execution handler for executing application commands.
  */
-class ApplicationCommandHandler(private val extension: SlashCommandExtension)
+class ApplicationCommandHandler(private val extension: SlashCommandExtension, private val kord: Kord): AutoCloseable {
+    private val eventJob: Job
+    private val log by logging<ApplicationCommandHandler>()
+
+    init {
+        log.info("Found ${extension.applicationCommands.size} application commands, 0 message commands, and 0 user commands to use!")
+
+        eventJob = kord.on<InteractionCreateEvent> { onInteraction(this) }
+    }
+
+    override fun close() {
+        eventJob.cancel()
+    }
+
+    private fun onInteraction(event: InteractionCreateEvent) = when (event.interaction.data.type) {
+        InteractionType.Ping -> {}
+        InteractionType.ApplicationCommand -> onApplicationCommand(event as ApplicationCommandInteractionCreateEvent)
+        else -> {
+            log.warn("Interaction type ${event.interaction.data.type.type} is not implemented.")
+        }
+    }
+
+    private fun onApplicationCommand(event: ApplicationCommandInteractionCreateEvent) {
+        log.debug("Checking if command /${event.interaction.invokedCommandName} exists in tree...")
+
+        val command = extension.applicationCommands.firstOrNull {
+            it.info.name == event.interaction.invokedCommandName
+        }
+
+        if (command == null) {
+            log.debug("Cannot find top-level command with name /${event.interaction.invokedCommandName}! Skipping...")
+            return
+        }
+
+        // val optionsMap = mutableMapOf<CommandOption<*>, Any?>()
+        println(event.interaction.data)
+    }
+}

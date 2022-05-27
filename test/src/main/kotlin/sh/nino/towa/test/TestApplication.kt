@@ -24,8 +24,34 @@
 @file:JvmName("TestApplicationKt")
 package sh.nino.towa.test
 
+import dev.kord.common.entity.PresenceStatus
+import kotlinx.coroutines.runBlocking
+import sh.nino.towa.core.Towa
+import sh.nino.towa.slash.commands.useSlashCommands
+import sh.nino.towa.slash.commands.locator.ListBasedLoader
+
 object TestApplication {
     @JvmStatic
     fun main(args: Array<String>) {
+        val token = args.first()
+        val towa = Towa {
+            kord(token) {
+                enableShutdownHook = true
+            }
+        }
+
+        towa.useSlashCommands {
+            locate(ListBasedLoader(listOf(MyFirstCommand)))
+            devServerId = 743698927039283201
+        }
+
+        runBlocking {
+            towa.kord.login {
+                presence {
+                    playing("with noobs.")
+                    status = PresenceStatus.Idle
+                }
+            }
+        }
     }
 }

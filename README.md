@@ -1,4 +1,4 @@
-# 👾 トワ towa
+# 👾 Towa (トワ)
 > *Powerful and advanced command handling library made for Discord*
 
 ## What is this?
@@ -8,8 +8,11 @@ of **Towa Tokoyami** from Hololive Gen 4.
 Towa has support for Discord's new slash commands API and for text-based commands if you want something done. Nino uses both slash
 and text-based commands (also known as "legacy-prefixed commands").
 
-**Towa** uses a concept to build off features that should be put into mutiple modules. This can be used from the `AbstractFeature`
+**Towa** uses a concept to build off features that should be put into mutiple modules. This can be used from the `AbstractExtension`
 where you can create your own features that can be exposed from the Towa API.
+
+## Who uses this?
+As of right now, [Nino](https://nino.sh) uses this! If you use it, submit a PR and you shall be showcased!~
 
 ## Example
 ```kotlin
@@ -17,23 +20,22 @@ suspend fun main(args: Array<String>) {
     val towa = Towa {
         // Enables the Slash Commands API
         useSlashCommands {
-            locator = ReflectionBasedLocator {
-                // Finds all the `AbstractApplicationCommand`s in `sh.nino.towa.commands`
-                commandsPackage = "sh.nino.towa.commands"
-
-                // Finds all `AbstractInhibitor`s in `sh.nino.towa.inhibitors`
-                inhibitorsPackage = "sh.nino.towa.inhibitors"
-            }
-
-            // Registers a default `/help` and `/ping` command.
-            addDefaultCommands(
-                DefaultCommand.Help,
-                DefaultCommand.Ping
-            )
+            locate(ReflectionLoader {
+                applicationCommandsPackage = "some.package.to.load.your.commands"
+                
+                configure { // This configures `ClassGraph`, which is internally used.
+                    
+                }
+            })
+        }
+        
+        kord("token") {
+            // Create your Kord instance here, or use `TowaBuilder.useKord` to
+            // use an existing instance.
         }
     }
     
-    // Registers all the commands, pipelines, and inhibitors.
+    // Registers all the commands and inhibitors.
     // It also registers all the select menu, text prompts, buttons,
     // and autocomplete handlers.
     towa.launch()
@@ -43,93 +45,9 @@ suspend fun main(args: Array<String>) {
 ## Subprojects
 **Towa** is split into multiple subprojects to abstract pieces from.
 
-- [towa-slash-commands](./slash-commands) **-** Slash commands implementation for Towa.
-- [towa-legacy-commands](./legacy-commands) **-** Legacy prefixed based commands impl for Towa.
-- [towa-locator-koin](./locators/koin) **-** Enables the use of Koin for injecting commands, pipelines, and inhibitors.
-- [towa-core](./core) **-** The core implementation for Towa.
-
-## Pipelines
-**Pipelines** are a concept to intercept the command execution process for anything really! If you wanted to do conditional logic,
-your best bet is to use an [**inhibitor**](#inhibitors).
-
-You can create a basic pipeline with the `createPipeline` function from **towa-core**:
-
-```kotlin
-val MyPipeline = createPipeline("some:pipeline:name") {
-    isGlobal = true
-    
-    onCommandExecuted { ctx ->
-        val command = ctx.command
-        val message = ctx.message
-        
-        log.info("Executed command ${command.name} from ${message.author.tag}!")
-    }
-    
-    onCommandErrored { ctx ->
-        log.error("Command ${ctx.command.name} has failed:", ctx.cause)
-    }
-    
-    onInteractable(InteractableType.BUTTON) { ctx ->
-        log.info("User ${ctx.message.author.tag} has clicked button with custom ID '${ctx.interactable<TowaButton>().id}'")
-    }
-}
-```
-
-You can extend from the **CommandExecutionPipeline**, **MainPipeline**, or **InteractionPipeline** if you want it to be registered
-if `isGlobal` is set to **true**, else you will need to register it to a command, so it can be interacted with.
-
-```kotlin
-class MyPipeline: CommandExecutionPipeline("some:pipeline:name") {
-    override val isGlobal: Boolean = true
-    
-    override suspend fun onCommandExecuted(ctx: CommandExecutedContext) {
-        val command = ctx.command
-        val message = ctx.message
-
-        log.info("Executed command ${command.name} from ${message.author.tag}!")
-    }
-    
-    override suspend fun onCommandErrored(ctx: CommandErroredContext) {
-        log.error("Command ${ctx.command.name} has failed:", ctx.cause)
-    }
-}
-```
-
-Pipelines can be executed globally or with a specific command, in which, you can register the pipeline using the `AbstractCommand.registerPipeline`
-and it will be called once the command reaches a certain point in the Towa lifecycle.
-
-## Inhibitors
-**Inhibitors** is a concept to guard a command based of a condition, for example:
-
-- If the user is executing a NSFW command and the channel is not a NSFW channel.
-- If the user should be in a guild and not in a DM channel with the bot.
-
-You can create your own inhibitors with the `createInhibitor` function if you do not use a locator or if the locator has inhibitor lookups
-disabled. To load them automatically, use an `AbstractInhibitor` class.
-
-```kotlin
-val MyInhibitor = createInhibitor("some:condition") { ctx ->
-    val channel = ctx.channel<TextChannel>()
-    if (!channel.nsfw) {
-        return err("You are not allowed to execute a NSFW command in a non NSFW channel!")
-    }
-    
-    return ok()
-}
-```
-
-```kotlin
-class MyInhibitor: AbstractInhibitor("some:condition") {
-    override suspend fun inhibit(ctx: CommandContext): InhibitorResult {
-        val channel = ctx.channel<TextChannel>()
-        if (!channel.nsfw) {
-            return err("You are not allowed to execute a NSFW command in a non NSFW channel!")
-        }
-
-        return ok()
-    }
-}
-```
+- [slash-commands](./slash-commands) **-** Slash commands implementation for Towa.
+- [legacy-commands](./legacy-commands) **-** Legacy prefixed based commands impl for Towa.
+- [core](./core) **-** The core implementation for Towa.
 
 ## Arguments
 > **Arguments** are only applicable to the **towa-legacy-commands** package only.

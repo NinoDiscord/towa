@@ -35,14 +35,15 @@ import sh.nino.towa.slash.commands.annotations.ApplicationCommand
 import sh.nino.towa.slash.commands.annotations.DeferEphemeral
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 /**
  * Represents the base class for executing slash commands.
  */
 abstract class AbstractApplicationCommand {
-    private val options = mutableListOf<CommandOption<*>>()
     private val log by logging<AbstractApplicationCommand>()
+    internal val options = mutableListOf<CommandOption<*>>()
 
     /**
      * Returns the list of localisations for this command's description, mapped by
@@ -77,6 +78,10 @@ abstract class AbstractApplicationCommand {
     val info: ApplicationCommand = this::class.findAnnotation() ?: error("Missing `@ApplicationCommand` annotation!")
 
     init {
+        findOptionsAndRegister()
+    }
+
+    private fun findOptionsAndRegister() {
         log.debug("Finding options in declared member properties in this class!")
         val properties = this::class.declaredMemberProperties.filter {
             it.returnType.jvmErasure.java.isAssignableFrom(CommandOption::class.java)
@@ -84,10 +89,15 @@ abstract class AbstractApplicationCommand {
 
         log.debug("Found ${properties.size} properties that are command options for command ${info.name}!")
         for (prop in properties) {
-            val result = prop.call(this) as? CommandOption<*> ?: continue
+            prop.isAccessible = true
+            val result = prop.call(this)
+            println(result)
+            // as? CommandOption<*> ?: continue
 
-            log.debug("  | -> Option ${result.name} - ${result.description}")
-            options.add(result)
+//            log.debug("  | -> Option ${result.name} - ${result.description}")
+//            options.add(result)
+//
+//            prop.isAccessible = false
         }
     }
 

@@ -23,4 +23,8 @@
 
 package sh.nino.towa.slash.commands.locator
 
-object EmptyLocator: ILocator
+import sh.nino.towa.slash.commands.application.AbstractApplicationCommand
+
+object EmptyLocator: ILocator {
+    override fun findCommands(): List<AbstractApplicationCommand> = listOf()
+}

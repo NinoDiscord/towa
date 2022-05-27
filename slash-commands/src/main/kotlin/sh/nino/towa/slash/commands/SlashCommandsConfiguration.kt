@@ -30,7 +30,7 @@ import sh.nino.towa.slash.commands.locator.ILocator
 /**
  * The configuration for the [SlashCommandExtension].
  */
-class SlashCommandsConfiguration(val locator: ILocator)
+class SlashCommandsConfiguration(val locator: ILocator, val devServerId: Long?)
 
 /**
  * The builder DSL for constructing a [SlashCommandsConfiguration] object.
@@ -40,11 +40,18 @@ class SlashCommandConfigBuilder {
     private var locator: ILocator? = null
 
     /**
+     * If you plan to test Towa out, this is the dedicated server you will use
+     * to test its functionality. It will register all the commands into
+     * this server.
+     */
+    var devServerId: Long? = null
+
+    /**
      * Registers a locator object.
      * @param locator The locator to register.
      */
     fun <L: ILocator> locate(locator: L) {
-        if (this.locator == null)
+        if (this.locator != null)
             throw IllegalStateException("Cannot re-register a locator!")
 
         this.locator = locator
@@ -54,6 +61,7 @@ class SlashCommandConfigBuilder {
      * Builds a new [SlashCommandsConfiguration] object.
      */
     fun build(): SlashCommandsConfiguration = SlashCommandsConfiguration(
-        if (locator == null) EmptyLocator else locator!!
+        if (locator == null) EmptyLocator else locator!!,
+        devServerId
     )
 }
