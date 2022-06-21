@@ -40,13 +40,7 @@ suspend fun main(args: Array<String>) {
 **Towa** is split into multiple subprojects to abstract pieces from.
 
 - [slash-commands](./slash-commands) **-** Slash commands implementation for Towa.
-- [legacy-commands](./legacy-commands) **-** Legacy prefixed based commands impl for Towa.
 - [core](./core) **-** The core implementation for Towa.
-
-## Arguments
-> **Arguments** are only applicable to the **towa-legacy-commands** package only.
-
-Coming soon.
 
 ## Installation
 > Documentation: https://towa.nino.sh
@@ -63,7 +57,7 @@ repositories {
 }
 
 dependencies {
-    implementation("sh.nino.towa:towa-<MODULE>:<VERSION>")
+    implementation("sh.nino.towa:<MODULE>:<VERSION>")
 }
 ```
 
@@ -76,7 +70,7 @@ repositories {
 }
 
 dependencies {
-    implementation "sh.nino.towa:towa-<MODULE>:<VERSION>"
+    implementation "sh.nino.towa:<MODULE>:<VERSION>"
 }
 ```
 
@@ -94,7 +88,7 @@ dependencies {
 <dependencies>
     <dependency>
         <groupId>sh.nino.towa</groupId>
-        <artifactId>towa-{{module}}</artifactId>
+        <artifactId>{{module}}</artifactId>
         <version>{{VERSION}}</version>
         <type>pom</type>
     </dependency>

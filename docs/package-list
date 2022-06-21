@@ -7,9 +7,6 @@ sh.nino.towa.core.annotations
 sh.nino.towa.core.extensions
 sh.nino.towa.core.locator
 sh.nino.towa.core.pipeline
-module:legacy-commands
-sh.nino.towa.commands.legacy
-sh.nino.towa.commands.legacy.annotations
 module:locator-koin
 sh.nino.towa.locator.koin
 module:slash-commands
@@ -27,5 +24,3 @@ sh.nino.towa.slash.commands.extensions
 sh.nino.towa.slash.commands.message
 sh.nino.towa.slash.commands.pagination
 sh.nino.towa.slash.commands.user
-module:test
-sh.nino.towa.test

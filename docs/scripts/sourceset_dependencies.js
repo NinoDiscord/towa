@@ -1,1 +1,1 @@
-sourceset_dependencies = '{":core:dokkaHtmlPartial/main":[],":legacy-commands:dokkaHtmlPartial/main":[],":locator-koin:dokkaHtmlPartial/main":[],":test:dokkaHtmlPartial/main":[],":slash-commands:dokkaHtmlPartial/main":[]}'
+sourceset_dependencies = '{":core:dokkaHtmlPartial/main":[],":locator-koin:dokkaHtmlPartial/main":[],":slash-commands:dokkaHtmlPartial/main":[]}'

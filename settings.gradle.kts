@@ -28,6 +28,5 @@ include(
     ":core",
     ":locator-koin",
     ":legacy-commands",
-    ":slash-commands",
-    ":test"
+    ":slash-commands"
 )
