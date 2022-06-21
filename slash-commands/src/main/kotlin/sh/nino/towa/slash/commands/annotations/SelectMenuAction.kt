@@ -24,6 +24,9 @@
 package sh.nino.towa.slash.commands.annotations
 
 /**
- * Represents the action of when a selection from a select menu has been clicked.
+ * Represents a method that will be executed if the select menu's custom ID represents the
+ * [id] specified, regardless what command executed it.
+ *
+ * @param id The custom ID this select menu represents.
  */
 annotation class SelectMenuAction(val id: String)

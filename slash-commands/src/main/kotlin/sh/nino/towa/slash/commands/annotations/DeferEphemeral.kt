@@ -24,7 +24,6 @@
 package sh.nino.towa.slash.commands.annotations
 
 /**
- * If the command should defer as an ephemeral message.
+ * If the command's messages should be deferred ephemerally.
  */
-@Target(AnnotationTarget.CLASS)
 annotation class DeferEphemeral

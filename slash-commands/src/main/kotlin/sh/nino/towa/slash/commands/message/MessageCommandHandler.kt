@@ -23,4 +23,53 @@
 
 package sh.nino.towa.slash.commands.message
 
-class MessageCommandHandler
+import dev.floofy.utils.slf4j.logging
+import dev.kord.core.event.interaction.ApplicationCommandInteractionCreateEvent
+import dev.kord.core.event.interaction.MessageCommandInteractionCreateEvent
+import sh.nino.towa.slash.commands.SlashCommandExtension
+import sh.nino.towa.slash.commands.events.message.*
+
+internal class MessageCommandHandler(private val extension: SlashCommandExtension) {
+    private val log by logging<MessageCommandHandler>()
+
+    suspend fun onApplicationCommand(event: ApplicationCommandInteractionCreateEvent) {
+        val ev = event as MessageCommandInteractionCreateEvent
+
+        log.debug("Received message command [${ev.interaction.invokedCommandName} (${ev.interaction.invokedCommandId})]")
+        val command = extension.config.messageCommands.firstOrNull {
+            it.name == ev.interaction.invokedCommandName
+        }
+
+        if (command == null) {
+            val context = MessageCommandPipelineContext(extension.pipeline)
+            extension.pipeline.emit(MessageCommandNotFound::class, context)
+
+            return
+        }
+
+        val pipelineCtx = MessageCommandPipelineContext(extension.pipeline)
+        pipelineCtx.attributes["command"] = command
+
+        extension.pipeline.emit(MessageCommandPropagation::class, pipelineCtx)
+        extension
+            .kord
+            .rest
+            .interaction
+            .deferMessage(event.interaction.id, event.interaction.token, command.deferEphemeral)
+
+        val context = MessageCommandContext(ev)
+        try {
+            command.execute(context)
+            extension.pipeline.emit(
+                MessageCommandExecuted::class,
+                pipelineCtx
+            )
+        } catch (e: Throwable) {
+            pipelineCtx.attributes["exception"] = e
+            extension.pipeline.emit(
+                MessageCommandException::class,
+                pipelineCtx
+            )
+        }
+    }
+}

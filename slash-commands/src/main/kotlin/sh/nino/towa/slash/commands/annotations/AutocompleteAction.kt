@@ -24,9 +24,7 @@
 package sh.nino.towa.slash.commands.annotations
 
 /**
- * Represents the autocomplete action for a specific option. The return signature
- * must return a `AutocompleteResult` object.
- *
- * @param option The option to use for this action.
+ * Represents a method that is supposed to be an autocomplete action method.
+ * @param name The option name to use
  */
-annotation class AutocompleteAction(val option: String)
+annotation class AutocompleteAction(val name: String)

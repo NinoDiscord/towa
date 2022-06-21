@@ -24,32 +24,9 @@
 package sh.nino.towa.slash.commands.annotations
 
 /**
- * Represents an action function on when a button was registered by a specific [AbstractApplicationCommand][sh.nino.towa.slash.commands.application.AbstractApplicationCommand].
- * You can also use a regular expression to match any button prompt action.
+ * Represents a method that will be executed if the button's custom ID represents the
+ * [id] specified, regardless what command executed it.
  *
- * ## Example
- * ```kotlin
- * @ApplicationCommand("my-command", "Some command!")
- * object MySlashCommand: AbstractApplicationCommand() {
- *    override suspend fun execute(ctx: ApplicationCommandContext) {
- *      createButtonInteractable("Are trans rights, human rights?") {
- *        option("yes", ButtonType.PRIMARY)
- *        option("no", ButtonType.DANGER)
- *      }
- *    }
- *
- *    @ButtonAction("yes")
- *    suspend fun onYes(ctx: ButtonInteractableContext) {
- *      ctx.reply("You are truely based.")
- *    }
- *
- *    @ButtonAction("no")
- *    suspend fun onNo(ctx: ButtonInteractableContext) {
- *      // u should probably break up with them or not be their
- *      // friend anymore.
- *    }
- * }
- * ```
+ * @param id The custom ID this button represents.
  */
-@Target(AnnotationTarget.FUNCTION)
 annotation class ButtonAction(val id: String)

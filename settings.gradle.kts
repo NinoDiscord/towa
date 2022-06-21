@@ -26,6 +26,7 @@ rootProject.name = "Towa"
 include(
     ":bom",
     ":core",
+    ":locator-koin",
     ":legacy-commands",
     ":slash-commands",
     ":test"

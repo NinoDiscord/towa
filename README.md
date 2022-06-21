@@ -20,13 +20,7 @@ suspend fun main(args: Array<String>) {
     val towa = Towa {
         // Enables the Slash Commands API
         useSlashCommands {
-            locate(ReflectionLoader {
-                applicationCommandsPackage = "some.package.to.load.your.commands"
-                
-                configure { // This configures `ClassGraph`, which is internally used.
-                    
-                }
-            })
+            
         }
         
         kord("token") {
@@ -57,7 +51,7 @@ Coming soon.
 ## Installation
 > Documentation: https://towa.nino.sh
 >
-> Version: 1.3.0
+> Version: 1.0.0
 
 ## Gradle
 ### Kotlin DSL

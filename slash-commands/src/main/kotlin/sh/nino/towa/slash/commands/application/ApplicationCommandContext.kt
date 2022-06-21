@@ -23,44 +23,89 @@
 
 package sh.nino.towa.slash.commands.application
 
+import dev.floofy.utils.kotlin.ifNotNull
+import dev.kord.common.annotation.KordExperimental
+import dev.kord.common.annotation.KordUnsafe
+import dev.kord.common.entity.DiscordMessage
+import dev.kord.common.entity.Snowflake
+import dev.kord.common.entity.optional.orEmpty
+import dev.kord.core.Kord
 import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
+import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.Channel
-import dev.kord.core.entity.interaction.Interaction
-import dev.kord.core.event.interaction.InteractionCreateEvent
+import dev.kord.core.entity.interaction.ApplicationCommandInteraction
+import dev.kord.core.event.interaction.ApplicationCommandInteractionCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.rest.builder.message.create.FollowupMessageCreateBuilder
+import dev.kord.rest.builder.message.create.embed
+import dev.kord.rest.builder.message.modify.FollowupMessageModifyBuilder
+import dev.kord.rest.builder.message.modify.WebhookMessageModifyBuilder
+import dev.kord.rest.builder.message.modify.embed
+import dev.kord.rest.json.request.WebhookEditMessageRequest
+import dev.kord.rest.route.Route
+import kotlinx.coroutines.runBlocking
 
-/**
- * Represents the context object of a top-level command or subcommand.
- * @param event The raw interaction event, which you can receive from [interaction].
- * @param options The raw options that was collected.
- * @param command The top-level command that this context object belongs to.
- * @param group The subcommand group object, if it was executed in one.
- * @param subcommand The subcommand that owns this context object, if it was executed as one.
- */
 class ApplicationCommandContext(
-    private val event: InteractionCreateEvent,
-    private val options: Map<CommandOption<*>, Any?>,
-    val command: AbstractApplicationCommand,
-    val group: ApplicationSubcommandGroup? = null,
-    val subcommand: ApplicationSubcommand? = null
+    private val event: ApplicationCommandInteractionCreateEvent,
+    private val options: Map<CommandOption<*>, Any?>
 ) {
     /**
-     * Returns the raw interaction object from the [InteractionCreateEvent].
+     * Returns the raw interaction object from the [ApplicationCommandInteractionCreateEvent].
      */
-    val interaction: Interaction = event.interaction
+    val interaction: ApplicationCommandInteraction = event.interaction
+
+    /**
+     * Returns the [Kord] instance from the [ApplicationCommandInteractionCreateEvent].
+     */
+    val kord: Kord = event.kord
+
+    /**
+     * Returns the [User] object that represents the command executor.
+     */
+    val author: User = event.interaction.data.user.value.ifNotNull {
+        User(it, kord)
+    }!!
+
+    /**
+     * Returns the [Member] object if there was one present.
+     */
+    val member: Member? = event.interaction.data.member.value.ifNotNull {
+        val userData = event.interaction.data.user.value!!
+        Member(it, userData, kord)
+    }
 
     /**
      * Returns a [command option][CommandOption] by the option object.
      * @param key The option object to search through
-     * @return The result casted to [U].
+     * @return The result cast to [U].
      * @throws IllegalStateException If the option was required and the result was `null`.
      */
     @Suppress("UNCHECKED_CAST")
     fun <U, T: CommandOption<U>> option(key: T): U {
-        val result = options[key]
-        if (result !is NullableOption && result == null)
-            throw IllegalStateException("Required option with name ${key.name} was not provided.")
+        if (!options.containsKey(key) && key !is NullableOption)
+            throw IllegalStateException("Required option with name '${key.name}' was not provided.")
 
-        return result as U
+        if (key is UserCommandOption) {
+            return runBlocking {
+                kord.getUser(options[key] as Snowflake)
+            } as U
+        }
+
+        if (key is ChannelCommandOption) {
+            return runBlocking {
+                kord.getChannel(options[key] as Snowflake)
+            } as U
+        }
+
+        if (key is RoleCommandOption) {
+            return runBlocking {
+                val guild = kord.getGuild(event.interaction.data.guildId.value!!)!!
+                guild.getRole(options[key] as Snowflake)
+            } as U
+        }
+
+        return options[key] as U
     }
 
     /**
@@ -75,8 +120,99 @@ class ApplicationCommandContext(
     }
 
     /**
-     * Returns the channel that this context was built upon, casted as [T].
+     * Returns the channel that this context was built upon, cast as [T].
      */
     @Suppress("UNCHECKED_CAST")
     suspend fun <T: Channel> getChannel(): T? = event.kord.getChannel(event.interaction.data.channelId) as? T
+
+    /**
+     * Sends out a reply to the user who has executed this command.
+     * @param ephemeral If the message should be an ephemeral message or not.
+     * @param builder The builder to send out.
+     */
+    suspend fun reply(
+        ephemeral: Boolean = false,
+        builder: FollowupMessageCreateBuilder.() -> Unit = {}
+    ): DiscordMessage = kord.rest.interaction.createFollowupMessage(
+        kord.selfId,
+        interaction.token,
+        FollowupMessageCreateBuilder(ephemeral).apply(builder).toRequest()
+    )
+
+    /**
+     * Sends out a reply to the user who has executed this command.
+     * @param content The content that should be sent out.
+     * @param ephemeral If the message should be marked as ephemeral
+     * @param embedBuilder The embed builder, if any.
+     */
+    suspend fun reply(
+        content: String,
+        ephemeral: Boolean = false,
+        embedBuilder: (EmbedBuilder.() -> Unit)? = null
+    ): DiscordMessage = reply(ephemeral) {
+        if (content.isNotEmpty())
+            this.content = content
+
+        if (embedBuilder != null)
+            embed(embedBuilder)
+    }
+
+    /**
+     * Edits a followup message created by [#reply()][reply].
+     * @param messageId The message ID that was in the reply.
+     * @param builder The builder to modify the message with.
+     */
+    suspend fun edit(
+        messageId: Snowflake,
+        builder: FollowupMessageModifyBuilder.() -> Unit = {}
+    ): DiscordMessage = kord.rest.interaction.modifyFollowupMessage(
+        kord.selfId,
+        interaction.token,
+        messageId,
+        FollowupMessageModifyBuilder().apply(builder).toRequest()
+    )
+
+    /**
+     * Edits a followup message created by [#reply()][reply].
+     * @param messageId The message ID that was in the reply.
+     * @param embedBuilder The embed builder, if any.
+     */
+    suspend fun edit(
+        messageId: Snowflake,
+        content: String,
+        embedBuilder: (EmbedBuilder.() -> Unit)? = null
+    ): DiscordMessage = edit(messageId) {
+        if (content.isNotEmpty())
+            this.content = content
+
+        if (embedBuilder != null)
+            this.embed(embedBuilder)
+    }
+
+    /**
+     * Edits the original message. By default, Towa defers the message update, so
+     * your best options are to use [#reply()][reply] to mark the message update
+     * complete, but you can use this to edit the original message, which is nothing.
+     *
+     * @param builder The builder object to use
+     */
+    @OptIn(KordUnsafe::class, KordExperimental::class)
+    suspend fun editOriginalMessage(
+        builder: WebhookMessageModifyBuilder.() -> Unit = {}
+    ): DiscordMessage = kord.rest.unsafe(Route.OriginalInteractionResponseModify) {
+        keys[Route.InteractionToken] = interaction.token
+        keys[Route.ApplicationId] = kord.selfId
+
+        val body = WebhookMessageModifyBuilder().apply(builder).toRequest()
+        body(WebhookEditMessageRequest.serializer(), body.request)
+        body.files.orEmpty().onEach { file(it) }
+    }
+
+    /**
+     * Deletes a message that was once created by the [#reply()][reply] function.
+     * @param messageId The message ID.
+     */
+    suspend fun delete(messageId: Snowflake) {
+        kord.rest.interaction.deleteFollowupMessage(kord.selfId, interaction.token, messageId)
+    }
 }

@@ -27,7 +27,6 @@ import dev.kord.common.Locale
 import dev.kord.common.entity.ApplicationCommandOption
 import dev.kord.common.entity.ApplicationCommandOptionType
 import dev.kord.common.entity.optional.Optional
-import sh.nino.towa.core.TowaDsl
 
 /**
  * Creates a subcommand group with a builder DSL.
@@ -35,7 +34,6 @@ import sh.nino.towa.core.TowaDsl
  * @param description The description of the subcommand group.
  * @return The [ApplicationSubcommandGroup] that was created.
  */
-@TowaDsl
 fun ApplicationSubcommandGroup(name: String, description: String, builder: ApplicationSubcommandGroup.() -> Unit = {}): ApplicationSubcommandGroup =
     ApplicationSubcommandGroup(name, description).apply(builder)
 
@@ -47,7 +45,7 @@ fun ApplicationSubcommandGroup(name: String, description: String, builder: Appli
 class ApplicationSubcommandGroup(val name: String, val description: String) {
     private val descriptionLocalisations = mutableMapOf<Locale, String>()
     private val nameLocalisations = mutableMapOf<Locale, String>()
-    private val subcommands = mutableListOf<ApplicationSubcommand>()
+    internal val subcommands = mutableListOf<AbstractApplicationSubcommand>()
     private val groups = mutableListOf<ApplicationSubcommandGroup>()
 
     /**
@@ -55,7 +53,7 @@ class ApplicationSubcommandGroup(val name: String, val description: String) {
      * @param subcommands The subcommands to insert.
      * @return This [subcommand group][ApplicationSubcommandGroup] to chain methods.
      */
-    fun addSubcommands(vararg subcommands: ApplicationSubcommand): ApplicationSubcommandGroup {
+    fun addSubcommands(vararg subcommands: AbstractApplicationSubcommand): ApplicationSubcommandGroup {
         for (subcommand in subcommands) addSubcommand(subcommand)
 
         return this
@@ -66,7 +64,7 @@ class ApplicationSubcommandGroup(val name: String, val description: String) {
      * @param subcommand The subcommand to insert.
      * @return This [subcommand group][ApplicationSubcommandGroup] to chain methods.
      */
-    fun addSubcommand(subcommand: ApplicationSubcommand): ApplicationSubcommandGroup {
+    fun addSubcommand(subcommand: AbstractApplicationSubcommand): ApplicationSubcommandGroup {
         this.subcommands.add(subcommand)
         return this
     }

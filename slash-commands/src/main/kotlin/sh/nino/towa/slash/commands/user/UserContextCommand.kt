@@ -22,3 +22,40 @@
  */
 
 package sh.nino.towa.slash.commands.user
+
+import dev.kord.common.entity.ApplicationCommandType
+import dev.kord.rest.json.request.ApplicationCommandCreateRequest
+import sh.nino.towa.slash.commands.annotations.DeferEphemeral
+import sh.nino.towa.slash.commands.annotations.OnlyInGuilds
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+
+/**
+ * Represents the base command interface, to construct user context commands.
+ */
+abstract class UserContextCommand(val name: String) {
+    /**
+     * If this command should be deferred ephemerally. This is `true` if [DeferEphemeral] was
+     * implemented in this class.
+     */
+    val deferEphemeral: Boolean = this::class.hasAnnotation<DeferEphemeral>()
+
+    /**
+     * Returns the list of guilds that this [UserContextCommand] is only available in.
+     */
+    val onlyInGuilds: List<String> = this::class.findAnnotation<OnlyInGuilds>()?.guilds?.toList() ?: emptyList()
+
+    /**
+     * Executes the command.
+     * @param ctx The user context object.
+     */
+    abstract suspend fun execute(ctx: UserContext)
+
+    /**
+     * Returns this [command][UserContextCommand] as a Kord request object.
+     */
+    fun toRequest(): ApplicationCommandCreateRequest = ApplicationCommandCreateRequest(
+        name,
+        type = ApplicationCommandType.User
+    )
+}

@@ -24,31 +24,55 @@
 @file:JvmName("TestApplicationKt")
 package sh.nino.towa.test
 
+import dev.floofy.utils.slf4j.logging
 import dev.kord.common.entity.PresenceStatus
+import dev.kord.core.event.gateway.ReadyEvent
+import dev.kord.core.on
 import kotlinx.coroutines.runBlocking
 import sh.nino.towa.core.Towa
-import sh.nino.towa.slash.commands.locator.ListBasedLoader
+import sh.nino.towa.slash.commands.events.command
+import sh.nino.towa.slash.commands.events.exception
+import sh.nino.towa.slash.commands.events.user.UserContextCommandExecuted
+import sh.nino.towa.slash.commands.events.user.UserContextException
+import sh.nino.towa.slash.commands.intercept
+import sh.nino.towa.slash.commands.slashCommands
 import sh.nino.towa.slash.commands.useSlashCommands
 
 object TestApplication {
+    private val log by logging<TestApplication>()
+
     @JvmStatic
     fun main(args: Array<String>) {
         val token = args.first()
         val towa = Towa {
-            kord(token) {
-                enableShutdownHook = true
+            kord(token)
+
+            useSlashCommands {
+                devGuildId = 743698927039283201
+                addApplicationCommand(MyFirstApplicationCommand())
+                addUserContextCommand(MyFirstUserContextCommand())
+                addMessageCommand(MyFirstMessageCommand())
             }
         }
 
-        towa.useSlashCommands {
-            locate(ListBasedLoader(listOf(MyFirstCommand)))
-            devServerId = 743698927039283201
+        val slashCommands = towa.slashCommands!!
+        slashCommands.intercept(UserContextCommandExecuted::class) {
+            log.info("Executed user context command [${command!!.name}]")
+        }
+
+        slashCommands.intercept(UserContextException::class) {
+            log.error("Unable to execute user context command [${command!!.name}]", exception)
+        }
+
+        towa.kord.on<ReadyEvent> {
+            log.info("Connected as ${self.tag} (${self.id})")
         }
 
         runBlocking {
+            towa.start()
             towa.kord.login {
                 presence {
-                    playing("with noobs.")
+                    competing("owo")
                     status = PresenceStatus.Idle
                 }
             }

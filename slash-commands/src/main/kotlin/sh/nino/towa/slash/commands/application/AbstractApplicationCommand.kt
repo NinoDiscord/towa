@@ -23,7 +23,6 @@
 
 package sh.nino.towa.slash.commands.application
 
-import dev.floofy.utils.slf4j.logging
 import dev.kord.common.DiscordBitSet
 import dev.kord.common.Locale
 import dev.kord.common.entity.ApplicationCommandType
@@ -31,18 +30,20 @@ import dev.kord.common.entity.Permissions
 import dev.kord.common.entity.optional.Optional
 import dev.kord.common.entity.optional.OptionalBoolean
 import dev.kord.rest.json.request.ApplicationCommandCreateRequest
-import sh.nino.towa.slash.commands.annotations.ApplicationCommand
 import sh.nino.towa.slash.commands.annotations.DeferEphemeral
+import sh.nino.towa.slash.commands.annotations.OnlyInGuilds
+import sh.nino.towa.slash.commands.annotations.SlashCommand
+import sh.nino.towa.slash.commands.message.MessageCommand
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.jvmErasure
+import kotlin.reflect.typeOf
 
 /**
  * Represents the base class for executing slash commands.
  */
-abstract class AbstractApplicationCommand {
-    private val log by logging<AbstractApplicationCommand>()
+abstract class AbstractApplicationCommand: Executable {
     internal val options = mutableListOf<CommandOption<*>>()
 
     /**
@@ -60,12 +61,17 @@ abstract class AbstractApplicationCommand {
     /**
      * Returns the list of subcommands connected to this [AbstractApplicationCommand].
      */
-    private val subcommandsList = mutableListOf<ApplicationSubcommand>()
+    internal val subcommandsList = mutableListOf<AbstractApplicationSubcommand>()
 
     /**
      * Returns the list of subcommand groups connected to this top-level [AbstractApplicationCommand].
      */
-    private val groupsList = mutableListOf<ApplicationSubcommandGroup>()
+    internal val groupsList = mutableListOf<ApplicationSubcommandGroup>()
+
+    /**
+     * Returns the list of guilds that this [MessageCommand] is only available in.
+     */
+    val onlyInGuilds: List<String> = this::class.findAnnotation<OnlyInGuilds>()?.guilds?.toList() ?: emptyList()
 
     /**
      * If this command should be deferred ephemerally.
@@ -75,29 +81,18 @@ abstract class AbstractApplicationCommand {
     /**
      * Returns the metadata about this [command][AbstractApplicationCommand].
      */
-    val info: ApplicationCommand = this::class.findAnnotation() ?: error("Missing `@ApplicationCommand` annotation!")
+    val info: SlashCommand = this::class.findAnnotation() ?: error("Missing `@SlashCommand` annotation!")
 
-    init {
-        findOptionsAndRegister()
-    }
-
-    private fun findOptionsAndRegister() {
-        log.debug("Finding options in declared member properties in this class!")
+    internal fun registerOptions() {
         val properties = this::class.declaredMemberProperties.filter {
-            it.returnType.jvmErasure.java.isAssignableFrom(CommandOption::class.java)
+            it.returnType.isSubtypeOf(typeOf<CommandOption<*>>())
         }
 
-        log.debug("Found ${properties.size} properties that are command options for command ${info.name}!")
         for (prop in properties) {
             prop.isAccessible = true
-            val result = prop.call(this)
-            println(result)
-            // as? CommandOption<*> ?: continue
 
-//            log.debug("  | -> Option ${result.name} - ${result.description}")
-//            options.add(result)
-//
-//            prop.isAccessible = false
+            val option = prop.call(this) as? CommandOption<*> ?: continue
+            options.add(option)
         }
     }
 
@@ -124,6 +119,44 @@ abstract class AbstractApplicationCommand {
     }
 
     /**
+     * Registers a subcommand into this [AbstractApplicationCommand].
+     * @param subcommand The subcommand to register
+     * @return This [command][AbstractApplicationCommand] to chain methods.
+     */
+    fun addSubcommand(subcommand: AbstractApplicationSubcommand): AbstractApplicationCommand {
+        subcommand.registerOptions()
+        this.subcommandsList.add(subcommand)
+        return this
+    }
+
+    /**
+     * Registers a list of subcommands into this [AbstractApplicationCommand].
+     * @param subcommand The subcommands to register in bulk
+     * @return This [command][AbstractApplicationCommand] to chain methods.
+     */
+    fun addSubcommands(vararg subcommands: AbstractApplicationSubcommand): AbstractApplicationCommand {
+        for (subcommand in subcommands) addSubcommand(subcommand)
+
+        return this
+    }
+
+    /**
+     * Registers a subcommand group into this [AbstractApplicationCommand].
+     * @param name The name of the subcommand group
+     * @param description The description of the subcommand
+     * @param group The group DSL builder to construct a [ApplicationSubcommandGroup].
+     * @return This [command][AbstractApplicationCommand] to chain methods.
+     */
+    fun addSubcommandGroup(
+        name: String,
+        description: String,
+        group: ApplicationSubcommandGroup.() -> Unit = {}
+    ): AbstractApplicationCommand {
+        groupsList.add(ApplicationSubcommandGroup(name, description, group))
+        return this
+    }
+
+    /**
      * Returns this [command][AbstractApplicationCommand] as a raw request object.
      */
     fun toRequest(): ApplicationCommandCreateRequest = ApplicationCommandCreateRequest(
@@ -132,15 +165,22 @@ abstract class AbstractApplicationCommand {
         ApplicationCommandType.ChatInput,
         Optional.invoke(info.description),
         Optional.invoke(descriptionLocalisations.toMap()),
-        Optional.invoke(options.map { it.toKordBuilder().toRequest() } + subcommandsList.map { it.toRawValue() } + groupsList.map { it.toRawValue() }),
-        Optional.invoke(Permissions.PermissionsBuilder(DiscordBitSet(info.defaultMemberPermissions)).permissions()),
+        Optional.invoke(
+            options.map {
+                it.toKordBuilder().toRequest()
+            } + subcommandsList.map {
+                it.toRawValue()
+            } + groupsList.map {
+                it.toRawValue()
+            }
+        ),
+        Optional.invoke(
+            if (info.defaultMemberPermissions.isEmpty())
+                Permissions()
+            else
+                Permissions.PermissionsBuilder(DiscordBitSet(info.defaultMemberPermissions)).permissions()
+        ),
         OptionalBoolean.Value(info.dmPermission),
         OptionalBoolean.Value(false)
     )
-
-    /**
-     * Executes the command.
-     * @param context The command's context.
-     */
-    abstract suspend fun execute(context: ApplicationCommandContext)
 }

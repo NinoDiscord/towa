@@ -47,15 +47,15 @@ private fun <T: Any> T.applySuspend(block: suspend T.() -> Unit): T {
  *
  * @param kord The [Kord] instance, if you already have created a Kord instance.
  */
-fun Towa(builder: suspend TowaBuilder.() -> Unit = {}): Towa =
-    TowaBuilder().applySuspend(builder).build()
+fun Towa(builder: TowaBuilder.() -> Unit = {}): Towa =
+    TowaBuilder().apply(builder).build()
 
 /**
  * The builder to construct the [Towa] object.
  */
 @TowaDsl
 class TowaBuilder {
-    private val extensions = mutableMapOf<String, AbstractExtension>()
+    val extensions = mutableMapOf<String, AbstractExtension>()
     private var kord: Kord by Delegates.notNull()
 
     /**
@@ -73,8 +73,8 @@ class TowaBuilder {
      * @param token The bot's token
      * @param builder The action to construct a [Kord] instance.
      */
-    suspend fun kord(token: String, builder: KordBuilder.() -> Unit = {}) {
-        this.kord = KordBuilder(token).apply(builder).build()
+    fun kord(token: String, builder: KordBuilder.() -> Unit = {}) {
+        this.kord = runBlocking { KordBuilder(token).apply(builder).build() }
     }
 
     /**
@@ -92,12 +92,5 @@ class TowaBuilder {
         for (extension in extensions.values) towa.register(extension)
 
         return towa
-    }
-}
-
-fun owo() {
-    val towa = Towa {
-        kord("") {
-        }
     }
 }

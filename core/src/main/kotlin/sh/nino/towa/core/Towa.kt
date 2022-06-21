@@ -29,8 +29,15 @@ import dev.kord.core.Kord
 import dev.kord.core.event.Event
 import dev.kord.core.on
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
+import sh.nino.towa.core.annotations.InjectKord
+import sh.nino.towa.core.annotations.InjectTowa
 import sh.nino.towa.core.extensions.AbstractExtension
 import java.io.Closeable
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 
 /**
  * Represents the main Towa object to interact with the lifecycle of Towa,
@@ -44,16 +51,14 @@ class Towa(val kord: Kord): Closeable {
     private val log by logging<Towa>()
 
     /**
-     * Returns a list of extensions that were created in this Towa object.
-     */
-    val extensions: Map<String, AbstractExtension> = extensionsMap.toMap()
-
-    /**
      * Registers an extension to this Towa object.
      * @param extension The extension to register.
      */
     fun <E: AbstractExtension> register(extension: E): Towa {
+        log.debug("Registering extension ${extension.key}...")
         extensionsMap.computeIfAbsent(extension.key) { extension }
+
+        log.debug("Registered!")
         return this
     }
 
@@ -64,8 +69,27 @@ class Towa(val kord: Kord): Closeable {
         // the vtuber usually says Ohayappi to say hello to her viewers.
         log.debug("おはやっぴー!! (Ohayappi)")
 
-        for ((key, extension) in extensions) {
+        for ((key, extension) in extensionsMap) {
             log.info("Loading extension $key...")
+
+            val kordProperty = extension::class.declaredMemberProperties.firstOrNull {
+                it.hasAnnotation<InjectKord>()
+            }
+
+            if (kordProperty != null) {
+                kordProperty.isAccessible = true
+                kordProperty.javaField?.set(extension, kord)
+            }
+
+            val towaProperty = extension::class.declaredMemberProperties.firstOrNull {
+                it.hasAnnotation<InjectTowa>()
+            }
+
+            if (towaProperty != null) {
+                towaProperty.isAccessible = true
+                towaProperty.javaField?.set(extension, this)
+            }
+
             try {
                 extension.load()
             } catch (e: Exception) {
@@ -91,8 +115,22 @@ class Towa(val kord: Kord): Closeable {
     override fun close() {
         // the vtuber usually says Otsuyappi to say goodbye to her viewers.
         log.warn("おつやっぴー... (Otsuyappi) :(")
+
+        for ((_, extension) in extensionsMap) {
+            runBlocking {
+                extension.unload()
+            }
+        }
+
+        extensionsMap.clear()
     }
 }
+
+/**
+ * Returns a list of extensions that were created in this Towa object.
+ */
+val Towa.extensions: Map<String, AbstractExtension>
+    get() = extensionsMap.toMap()
 
 /**
  * Checks if an extension by its [key] exists in this Towa object. If not,

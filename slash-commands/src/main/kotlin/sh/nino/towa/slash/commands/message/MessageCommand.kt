@@ -23,4 +23,38 @@
 
 package sh.nino.towa.slash.commands.message
 
-abstract class MessageCommand
+import dev.kord.common.entity.ApplicationCommandType
+import dev.kord.rest.json.request.ApplicationCommandCreateRequest
+import sh.nino.towa.slash.commands.annotations.DeferEphemeral
+import sh.nino.towa.slash.commands.annotations.OnlyInGuilds
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+
+/**
+ * Represents the base command interface, to construct message commands.
+ */
+abstract class MessageCommand(val name: String) {
+    /**
+     * If the command should be deferred ephemerally.
+     */
+    val deferEphemeral: Boolean = this::class.hasAnnotation<DeferEphemeral>()
+
+    /**
+     * Returns the list of guilds that this [MessageCommand] is only available in.
+     */
+    val onlyInGuilds: List<String> = this::class.findAnnotation<OnlyInGuilds>()?.guilds?.toList() ?: emptyList()
+
+    /**
+     * Executes the command.
+     * @param context The message command context object.
+     */
+    abstract suspend fun execute(context: MessageCommandContext)
+
+    /**
+     * Returns this [command][MessageCommand] as a Kord request object.
+     */
+    fun toRequest(): ApplicationCommandCreateRequest = ApplicationCommandCreateRequest(
+        name,
+        type = ApplicationCommandType.Message
+    )
+}
