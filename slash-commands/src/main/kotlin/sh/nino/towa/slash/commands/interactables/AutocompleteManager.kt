@@ -32,11 +32,9 @@ import sh.nino.towa.slash.commands.application.StringCommandOption
 import sh.nino.towa.slash.commands.applicationCommands
 import sh.nino.towa.slash.commands.events.application.ApplicationCommandNotFound
 import sh.nino.towa.slash.commands.events.application.ApplicationCommandPipelineContext
-import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompleteException
-import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompleteExecute
 import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompleteFunctionNotFound
 import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompletePipelineContext
-//import sh.nino.towa.slash.commands.interactables.context.AutocompleteContext
+// import sh.nino.towa.slash.commands.interactables.context.AutocompleteContext
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.hasAnnotation
 
