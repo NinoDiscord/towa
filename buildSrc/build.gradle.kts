@@ -38,6 +38,6 @@ dependencies {
     implementation("org.jetbrains.dokka:dokka-gradle-plugin:1.6.21")
     implementation(kotlin("gradle-plugin", version = "1.6.21"))
     implementation(kotlin("serialization", version = "1.6.21"))
-    implementation("dev.floofy.commons:gradle:2.1.0.1")
+    implementation("dev.floofy.commons:gradle:2.1.1")
     implementation("io.kotest:kotest-gradle-plugin:0.3.9")
 }
