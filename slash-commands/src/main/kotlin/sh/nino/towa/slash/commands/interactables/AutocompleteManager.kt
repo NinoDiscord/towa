@@ -36,7 +36,7 @@ import sh.nino.towa.slash.commands.events.interactables.autocomplete.Autocomplet
 import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompleteExecute
 import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompleteFunctionNotFound
 import sh.nino.towa.slash.commands.events.interactables.autocomplete.AutocompletePipelineContext
-import sh.nino.towa.slash.commands.interactables.context.AutocompleteContext
+//import sh.nino.towa.slash.commands.interactables.context.AutocompleteContext
 import kotlin.reflect.full.declaredMemberFunctions
 import kotlin.reflect.full.hasAnnotation
 
@@ -86,20 +86,20 @@ internal class AutocompleteManager(private val extension: SlashCommandExtension)
             return
         }
 
-        try {
-            val autocompleteContext = AutocompleteContext(event, towaOption as StringCommandOption)
-
-            extension
-                .kord
-                .rest
-                .interaction
-                .deferMessage(event.interaction.id, event.interaction.token, false)
-
-            autocompleteMethod.call(command, autocompleteContext)
-            extension.pipeline.emit(AutocompleteExecute::class, context)
-        } catch (e: Throwable) {
-            context.attributes["exception"] = e
-            extension.pipeline.emit(AutocompleteException::class, context)
-        }
+//        try {
+//            val autocompleteContext = AutocompleteContext(event, towaOption as StringCommandOption)
+//
+//            extension
+//                .kord
+//                .rest
+//                .interaction
+//                .deferMessage(event.interaction.id, event.interaction.token, false)
+//
+//            autocompleteMethod.call(command, autocompleteContext)
+//            extension.pipeline.emit(AutocompleteExecute::class, context)
+//        } catch (e: Throwable) {
+//            context.attributes["exception"] = e
+//            extension.pipeline.emit(AutocompleteException::class, context)
+//        }
     }
 }

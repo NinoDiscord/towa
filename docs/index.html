@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>All modules</title>
+    <link href="images/logo-icon.svg" rel="icon" type="image/svg">
+    <script>var pathToRoot = "";</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+const savedDarkMode = storage ? JSON.parse(storage) : false
+if(savedDarkMode === true){
+    document.getElementsByTagName("html")[0].classList.add("theme-dark")
+}</script>
+<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
+<link href="styles/style.css" rel="Stylesheet">
+<link href="styles/jetbrains-mono.css" rel="Stylesheet">
+<link href="styles/main.css" rel="Stylesheet">
+<link href="styles/prism.css" rel="Stylesheet">
+<link href="styles/logo-styles.css" rel="Stylesheet">
+<script type="text/javascript" src="scripts/clipboard.js" async="async"></script>
+<script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/prism.js" async="async"></script>
+</head>
+<body>
+<div class="navigation-wrapper" id="navigation-wrapper">
+    <div id="leftToggler"><span class="icon-toggler"></span></div>
+    <div class="library-name">
+            <a href="index.html">
+                    <span>Towa</span>
+            </a>
+    </div>
+    <div>
+1.0    </div>
+    <div class="pull-right d-flex">
+        <button id="theme-toggle-button"><span id="theme-toggle"></span></button>
+        <div id="searchBar"></div>
+    </div>
+</div>
+<div id="container">
+    <div id="leftColumn">
+        <div id="sideMenu"></div>
+    </div>
+    <div id="main">
+<div class="main-content" id="content" pageIds="Towa::.ext/allModules///PointingToDeclaration//0">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <div class="cover ">
+      <h1 class="">👾 Towa (トワ)</h1>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">
+            <p class="paragraph"><i>Powerful and advanced command handling library made for Discord</i></p>
+          </code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h2 class=""> What is this?</h2>
+      <p class="paragraph">This is a (totally original) command handling library for <a href="https://github.com/kordlib/kord">Kord</a>. The name &quot;Towa&quot; was an inspiration of <strong>Towa Tokoyami</strong> from Hololive Gen 4.</p>
+      <p class="paragraph">Towa has support for Discord's new slash commands API and for text-based commands if you want something done. Nino uses both slash and text-based commands (also known as &quot;legacy-prefixed commands&quot;).</p>
+      <p class="paragraph"><strong>Towa</strong> uses a concept to build off features that should be put into mutiple modules. This can be used from the <code class="lang-kotlin">AbstractExtension</code> where you can create your own features that can be exposed from the Towa API.</p>
+      <h2 class=""> Who uses this?</h2>
+      <p class="paragraph">As of right now, <a href="https://nino.sh">Nino</a> uses this! If you use it, submit a PR and you shall be showcased!~</p>
+      <h2 class=""> Example</h2>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">suspend fun main(args: Array&lt;String&gt;) {<br>    val towa = Towa {<br>        // Enables the Slash Commands API<br>        useSlashCommands {<br><br>        }<br><br>        kord(&quot;token&quot;) {<br>            // Create your Kord instance here, or use `TowaBuilder.useKord` to<br>            // use an existing instance.<br>        }<br>    }<br><br>    // Registers all the commands and inhibitors.<br>    // It also registers all the select menu, text prompts, buttons,<br>    // and autocomplete handlers.<br>    towa.launch()<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h2 class=""> Subprojects</h2>
+      <p class="paragraph"><strong>Towa</strong> is split into multiple subprojects to abstract pieces from.</p>
+      <ul>
+        <li>
+          <p class="paragraph">./slash-commands<strong>-</strong> Slash commands implementation for Towa.</p>
+        </li>
+        <li>
+          <p class="paragraph">./legacy-commands<strong>-</strong> Legacy prefixed based commands impl for Towa.</p>
+        </li>
+        <li>
+          <p class="paragraph">./core<strong>-</strong> The core implementation for Towa.</p>
+        </li>
+      </ul>
+      <h2 class=""> Arguments</h2>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">
+            <p class="paragraph"><strong>Arguments</strong> are only applicable to the <strong>towa-legacy-commands</strong> package only.</p>
+          </code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <p class="paragraph">Coming soon.</p>
+      <h2 class=""> Installation</h2>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">
+            <p class="paragraph">Documentation: https://towa.nino.sh</p>
+            <p class="paragraph">Version: 1.0.0</p>
+          </code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h2 class=""> Gradle</h2>
+      <h3 class=""> Kotlin DSL</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-kotlin" theme="idea">repositories {<br>    maven {<br>        url = uri(&quot;https://maven.floofy.dev/repo/releases&quot;)<br>    }<br>}<br><br>dependencies {<br>    implementation(&quot;sh.nino.towa:towa-&lt;MODULE&gt;:&lt;VERSION&gt;&quot;)<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h3 class=""> Groovy DSL</h3>
+      <div class="sample-container">
+        <pre><code class="block lang-groovy" theme="idea">repositories {<br>    maven {<br>        url &quot;https://maven.floofy.dev/repo/releases&quot;<br>    }<br>}<br><br>dependencies {<br>    implementation &quot;sh.nino.towa:towa-&lt;MODULE&gt;:&lt;VERSION&gt;&quot;<br>}</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h2 class=""> Maven</h2>
+      <div class="sample-container">
+        <pre><code class="block lang-xml" theme="idea">&lt;repositories&gt;<br>    &lt;repository&gt;<br>        &lt;id&gt;noel-maven&lt;/id&gt;<br>        &lt;url&gt;https://maven.floofy.dev/repo/releases&lt;/url&gt;<br>    &lt;/repository&gt;<br>&lt;/repositories&gt;</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <div class="sample-container">
+        <pre><code class="block lang-xml" theme="idea">&lt;dependencies&gt;<br>    &lt;dependency&gt;<br>        &lt;groupId&gt;sh.nino.towa&lt;/groupId&gt;<br>        &lt;artifactId&gt;towa-{{module}}&lt;/artifactId&gt;<br>        &lt;version&gt;{{VERSION}}&lt;/version&gt;<br>        &lt;type&gt;pom&lt;/type&gt;<br>    &lt;/dependency&gt;<br>&lt;/dependencies&gt;</code></pre>
+<span class="top-right-position"><span class="copy-icon"></span>
+          <div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div>
+        </span></div>
+      <h2 class=""> Contributing</h2>
+      <p class="paragraph">Thanks for considering contributing to <strong>Towa</strong>! Before you boop your heart out on your keyboard ✧ ─=≡Σ((( つ•̀ω•́)つ, we recommend you to do the following:</p>
+      <ul>
+        <li>
+          <p class="paragraph">Read the ./.github/CODE_OF_CONDUCT.md</p>
+        </li>
+        <li>
+          <p class="paragraph">Read the ./.github/CONTRIBUTING.md</p>
+        </li>
+      </ul>
+      <p class="paragraph">If you read both if you're a new time contributor, now you can do the following:</p>
+      <ul>
+        <li>
+          <p class="paragraph"><a href="https://github.com/NinoDiscord/towa/fork">Fork me! ＊*♡( ⁎ᵕᴗᵕ⁎ ）</a></p>
+        </li>
+        <li>
+          <p class="paragraph">Clone your fork on your machine: <code class="lang-kotlin">git clone https://github.com/your-username/towa</code></p>
+        </li>
+        <li>
+          <p class="paragraph">Create a new branch: <code class="lang-kotlin">git checkout -b some-branch-name</code></p>
+        </li>
+        <li>
+          <p class="paragraph">BOOP THAT KEYBOARD!!!! ♡┉ˏ͛ (❛ 〰 ❛)ˊˎ┉♡</p>
+        </li>
+        <li>
+          <p class="paragraph">Commit your changes onto your branch: <code class="lang-kotlin">git commit -am &quot;add features （｡&gt;‿‿&lt;｡ ）&quot;</code></p>
+        </li>
+        <li>
+          <p class="paragraph">Push it to the fork you created: <code class="lang-kotlin">git push -u origin some-branch-name</code></p>
+        </li>
+        <li>
+          <p class="paragraph">Submit a Pull Request and then cry! ｡･ﾟﾟ･(థ Д థ。)･ﾟﾟ･｡</p>
+        </li>
+      </ul>
+      <h2 class=""> License</h2>
+      <p class="paragraph"><strong>Towa トワ</strong> is licensed under the <strong>MIT License</strong> by the Nino Team with love :purple_heart:~</p>
+    </div>
+    <h2 class="">All modules:</h2>
+    <div class="table"><a data-name="-387464810%2FMain%2F0" anchor-label="core" id="-387464810%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="core/index.html">core</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-387464810%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
+<a data-name="-1112385791%2FMain%2F0" anchor-label="legacy-commands" id="-1112385791%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="legacy-commands/index.html">legacy-commands</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1112385791%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
+<a data-name="-396807179%2FMain%2F0" anchor-label="locator-koin" id="-396807179%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="locator-koin/index.html">locator-koin</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-396807179%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
+<a data-name="-1493111427%2FMain%2F0" anchor-label="slash-commands" id="-1493111427%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="slash-commands/index.html">slash-commands</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1493111427%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
+<a data-name="-1810328573%2FMain%2F0" anchor-label="test" id="-1810328573%2FMain%2F0" data-filterable-set=""></a>
+      <div class="table-row">
+        <div class="main-subrow ">
+          <div class="w-100"><span class="inline-flex">
+              <div><a href="test/index.html">test</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1810328573%2FMain%2F0"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div><span class="brief-comment"></span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+        <div class="footer"><span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2022 Copyright</span><span
+                class="pull-right"><span>Generated by </span><a
+                href="https://github.com/Kotlin/dokka"><span>dokka</span><span class="padded-icon"></span></a></span>
+        </div>
+    </div>
+</div>
+</body>
+</html>
