@@ -36,8 +36,3 @@ val VERSION = Version(1, 0, 0, 0, ReleaseType.None)
  * artifacts.
  */
 val JAVA_VERSION = JavaVersion.VERSION_17
-
-/**
- * Returns the commit hash of the Git repository.
- */
-// val COMMIT_HASH by lazy {}

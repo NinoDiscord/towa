@@ -102,6 +102,7 @@ tasks {
     dokkaHtml {
         dokkaSourceSets {
             configureEach {
+                moduleName.set("towa-${project.name}")
                 platform.set(org.jetbrains.dokka.Platform.jvm)
                 jdkVersion.set(17)
                 includes.from("DokkaDescription.md")
