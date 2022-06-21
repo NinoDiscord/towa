@@ -27,6 +27,5 @@ include(
     ":bom",
     ":core",
     ":locator-koin",
-    ":legacy-commands",
     ":slash-commands"
 )
