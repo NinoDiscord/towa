@@ -27,7 +27,7 @@ plugins {
 }
 
 dependencies {
-    implementation("dev.kord:kord-core:0.8.0-M14")
+    implementation("dev.kord:kord-core:0.8.0-M15")
     api("io.github.classgraph:classgraph:4.8.149")
     api("io.insert-koin:koin-core:3.2.0")
 }
