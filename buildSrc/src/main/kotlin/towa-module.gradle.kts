@@ -55,7 +55,7 @@ dependencies {
 
     // Noel Utilities
     implementation("dev.floofy.commons:extensions-kotlin:2.1.1")
-    implementation("dev.floofy.commons:slf4j:2.1.1")
+    implementation("dev.floofy.commons:slf4j:2.2.1")
 
     // SLF4J for logging
     api("org.slf4j:slf4j-api:1.7.36")
